@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./version.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#060b1e;}
+*{box-sizing:border-box;}
+a{color:#e8b84b;} a:hover{color:#f5cf6d;}
+button{font-family:inherit;}
+@keyframes mfPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,184,75,.5);}50%{box-shadow:0 0 30px 4px rgba(232,184,75,.8);}}
+@keyframes mfPop{from{opacity:0;transform:translateY(14px) scale(.97);}to{opacity:1;transform:none;}}
+@keyframes mfShim{0%{background-position:0% 50%;}100%{background-position:200% 50%;}}
+@keyframes mfGlow{0%,100%{text-shadow:0 0 24px rgba(232,184,75,.35);}50%{text-shadow:0 0 60px rgba(232,184,75,.75);}}
+</style>
+</helmet>
+<div style="min-height:100vh;width:100%;font-family:'Archivo',sans-serif;color:#eef1fa;background:radial-gradient(1300px 800px at 50% -12%, #17234f 0%, #0a1130 48%, #060b1e 100%);display:flex;flex-direction:column;">
+
+<sc-if value="{{ isStart }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Start" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;">
+  <div style="font-size:13px;letter-spacing:6px;color:#8d97b8;font-weight:600;margin-bottom:18px;">DAS QUIZ · 15 FRAGEN · EINE MILLION</div>
+  <h1 style="margin:0;font-size:76px;line-height:1.02;font-weight:900;letter-spacing:1px;background:linear-gradient(90deg,#e8b84b,#f8e3a8,#e8b84b,#b98a24);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:mfShim 5s linear infinite;">DIE<br>MILLIONENFRAGE</h1>
+  <p style="margin:22px 0 0;font-size:19px;color:#b9c2e0;max-width:560px;">Beantworten Sie 15 Fragen und gewinnen Sie <strong style="color:#f5cf6d;">1.000.000&nbsp;€</strong>. Bei einer falschen Antwort fallen Sie auf die letzte Sicherheitsstufe zurück.</p>
+  <div style="display:flex;gap:16px;margin:40px 0;flex-wrap:wrap;justify-content:center;">
+    <div style="width:250px;border:1px solid rgba(232,184,75,.28);border-radius:14px;padding:18px 20px;background:rgba(13,23,55,.7);text-align:left;">
+      <div style="font-size:12px;letter-spacing:3px;color:#e8b84b;font-weight:700;margin-bottom:10px;">GEWINNLEITER</div>
+      <div style="font-size:14px;color:#b9c2e0;line-height:1.7;">15 Stufen von 50&nbsp;€ bis 1&nbsp;Million.<br>Sicherheitsstufen bei <strong style="color:#eef1fa;">500&nbsp;€</strong> und <strong style="color:#eef1fa;">16.000&nbsp;€</strong>.</div>
+    </div>
+    <div style="width:250px;border:1px solid rgba(232,184,75,.28);border-radius:14px;padding:18px 20px;background:rgba(13,23,55,.7);text-align:left;">
+      <div style="font-size:12px;letter-spacing:3px;color:#e8b84b;font-weight:700;margin-bottom:10px;">VIER JOKER</div>
+      <div style="font-size:14px;color:#b9c2e0;line-height:1.7;">50:50 · Publikum · Telefon · Fragen&#8209;Tausch. Jeder nur einmal pro Spiel.</div>
+    </div>
+    <div style="width:250px;border:1px solid rgba(232,184,75,.28);border-radius:14px;padding:18px 20px;background:rgba(13,23,55,.7);text-align:left;">
+      <div style="font-size:12px;letter-spacing:3px;color:#e8b84b;font-weight:700;margin-bottom:10px;">STEUERUNG</div>
+      <div style="font-size:14px;color:#b9c2e0;line-height:1.7;">Tasten <strong style="color:#eef1fa;">A–D</strong> wählen, <strong style="color:#eef1fa;">Enter</strong> loggt ein, <strong style="color:#eef1fa;">Esc</strong> geht zurück.</div>
+    </div>
+  </div>
+  <button onClick="{{ onStart }}" style="cursor:pointer;border:none;border-radius:999px;padding:18px 64px;font-size:20px;font-weight:800;letter-spacing:2px;color:#1a1206;background:linear-gradient(180deg,#f5cf6d,#d9a52f);box-shadow:0 10px 40px rgba(232,184,75,.35);" style-hover="transform:translateY(-2px);box-shadow:0 14px 50px rgba(232,184,75,.5);">SPIEL STARTEN</button>
+  <div style="margin-top:16px;font-size:13px;color:#5d6684;">Sie können vor jeder Frage mit dem aktuellen Gewinn aussteigen.</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isGame }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Spiel" style="flex:1;display:flex;flex-direction:column;">
+  <div style="display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid rgba(232,184,75,.18);background:rgba(6,10,26,.5);">
+    <div style="font-weight:900;letter-spacing:2px;font-size:14px;color:#e8b84b;white-space:nowrap;">DIE MILLIONENFRAGE</div>
+    <div style="flex:1;display:flex;justify-content:center;gap:10px;">
+      <sc-for list="{{ jokers }}" as="j" hint-placeholder-count="4">
+        <button onClick="{{ j.onClick }}" title="{{ j.title }}" style="cursor:pointer;border:1px solid rgba(232,184,75,.4);border-radius:999px;padding:9px 18px;font-size:14px;font-weight:700;letter-spacing:1px;color:#f0d9a0;background:linear-gradient(180deg,#152052,#0c1434);opacity:{{ j.op }};text-decoration:{{ j.deco }};pointer-events:{{ j.pe }};" style-hover="border-color:#e8b84b;background:linear-gradient(180deg,#1b2a68,#101a44);">{{ j.label }}</button>
+      </sc-for>
+    </div>
+    <button onClick="{{ toggleSound }}" title="Ton an/aus" style="cursor:pointer;border:1px solid rgba(141,151,184,.35);border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;color:#b9c2e0;background:transparent;white-space:nowrap;" style-hover="border-color:#b9c2e0;">{{ soundLabel }}</button>
+    <button onClick="{{ onQuitAsk }}" style="cursor:pointer;border:1px solid rgba(224,69,90,.5);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:700;letter-spacing:1px;color:#ff97a6;background:transparent;opacity:{{ quitOp }};pointer-events:{{ quitPe }};" style-hover="background:rgba(224,69,90,.12);border-color:#e0455a;">AUSSTEIGEN</button>
+  </div>
+
+  <div style="flex:1;display:flex;min-height:0;">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:28px 40px 34px;max-width:1080px;margin:0 auto;width:100%;">
+      <div style="min-height:26px;text-align:center;font-style:italic;font-size:16px;color:#b9c2e0;margin-bottom:14px;">{{ quip }}</div>
+      <div style="border:1px solid rgba(232,184,75,.4);border-radius:16px;padding:24px 32px;background:linear-gradient(180deg,rgba(17,28,66,.95),rgba(9,14,36,.95));box-shadow:0 20px 60px rgba(0,0,0,.45);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:12px;">
+          <div style="font-size:13px;letter-spacing:3px;font-weight:700;color:#8d97b8;">FRAGE {{ tierNum }} VON 15</div>
+          <div style="font-size:17px;font-weight:800;color:#f5cf6d;font-variant-numeric:tabular-nums;">{{ amountLabel }}</div>
+        </div>
+        <div style="font-size:27px;font-weight:700;line-height:1.35;text-wrap:pretty;">{{ questionText }}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;">
+        <sc-for list="{{ answers }}" as="ans" hint-placeholder-count="4">
+          <div onClick="{{ ans.pick }}" style="display:flex;align-items:center;gap:14px;border-radius:12px;padding:17px 20px;border:1px solid {{ ans.border }};background:{{ ans.bg }};opacity:{{ ans.op }};cursor:{{ ans.cursor }};animation:{{ ans.anim }};transition:background .2s,border-color .2s,opacity .3s;" style-hover="border-color:rgba(245,207,109,.9);">
+            <span style="font-weight:900;font-size:17px;color:{{ ans.lc }};width:22px;">{{ ans.letter }}</span>
+            <span style="font-size:18px;font-weight:600;color:{{ ans.tc }};">{{ ans.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="min-height:74px;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:14px;">
+        <sc-if value="{{ showConfirm }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ onLock }}" style="cursor:pointer;border:none;border-radius:999px;padding:14px 42px;font-size:17px;font-weight:800;letter-spacing:1px;color:#1a1206;background:linear-gradient(180deg,#f5cf6d,#d9a52f);box-shadow:0 8px 30px rgba(232,184,75,.3);" style-hover="transform:translateY(-1px);">EINLOGGEN</button>
+          <button onClick="{{ onUnpick }}" style="cursor:pointer;border:1px solid rgba(141,151,184,.4);border-radius:999px;padding:14px 30px;font-size:15px;font-weight:600;color:#b9c2e0;background:transparent;" style-hover="border-color:#b9c2e0;">Andere Antwort</button>
+        </sc-if>
+        <sc-if value="{{ showSuspense }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:16px;letter-spacing:4px;color:#8d97b8;font-weight:600;">EINGELOGGT …</div>
+        </sc-if>
+        <sc-if value="{{ showNext }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:18px;font-weight:800;color:#4be389;">{{ revealMsg }}</div>
+          <button onClick="{{ onNext }}" style="cursor:pointer;border:none;border-radius:999px;padding:14px 42px;font-size:17px;font-weight:800;letter-spacing:1px;color:#04170b;background:linear-gradient(180deg,#4be389,#22a45a);box-shadow:0 8px 30px rgba(75,227,137,.25);" style-hover="transform:translateY(-1px);">{{ nextLabel }}</button>
+        </sc-if>
+        <sc-if value="{{ showLose }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:18px;font-weight:800;color:#ff8093;">{{ revealMsg }}</div>
+          <button onClick="{{ onToEnd }}" style="cursor:pointer;border:none;border-radius:999px;padding:14px 42px;font-size:17px;font-weight:800;letter-spacing:1px;color:#fff;background:linear-gradient(180deg,#e0455a,#a52338);" style-hover="transform:translateY(-1px);">ZUR AUSWERTUNG</button>
+        </sc-if>
+      </div>
+      <div style="text-align:center;font-size:12px;color:#4d5678;letter-spacing:1px;">A–D wählen · Enter einloggen · Esc zurück</div>
+    </div>
+
+    <aside style="width:280px;flex-shrink:0;border-left:1px solid rgba(232,184,75,.18);background:rgba(6,10,26,.45);padding:18px 16px;display:flex;flex-direction:column;justify-content:center;gap:2px;">
+      <sc-for list="{{ ladderRows }}" as="r" hint-placeholder-count="15">
+        <div style="display:flex;align-items:center;gap:10px;padding:5px 12px;border-radius:8px;background:{{ r.bg }};color:{{ r.color }};font-weight:{{ r.fw }};font-size:15px;">
+          <span style="width:20px;font-size:12px;color:{{ r.numColor }};font-variant-numeric:tabular-nums;">{{ r.num }}</span>
+          <span style="width:12px;font-size:9px;color:{{ r.markColor }};">{{ r.mark }}</span>
+          <span style="flex:1;text-align:right;font-variant-numeric:tabular-nums;letter-spacing:.5px;">{{ r.amount }}</span>
+        </div>
+      </sc-for>
+      <div style="margin-top:14px;border-top:1px solid rgba(232,184,75,.18);padding-top:12px;display:flex;justify-content:space-between;font-size:13px;color:#8d97b8;">
+        <span>Sicher:</span><span style="color:#f0d9a0;font-weight:700;font-variant-numeric:tabular-nums;">{{ securedLabel }}</span>
+      </div>
+    </aside>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isEnd }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Ende" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;animation:mfPop .5s ease both;">
+  <div style="font-size:14px;letter-spacing:6px;font-weight:800;color:{{ endTitleColor }};margin-bottom:14px;">{{ endTitle }}</div>
+  <div style="font-size:92px;font-weight:900;color:#f5cf6d;font-variant-numeric:tabular-nums;letter-spacing:1px;animation:mfGlow 2.4s ease-in-out infinite;">{{ endAmount }}</div>
+  <p style="margin:14px 0 0;font-size:18px;color:#b9c2e0;max-width:520px;">{{ endLine }}</p>
+  <div style="display:flex;gap:14px;margin:38px 0;flex-wrap:wrap;justify-content:center;">
+    <sc-for list="{{ statChips }}" as="s" hint-placeholder-count="3">
+      <div style="border:1px solid rgba(232,184,75,.28);border-radius:14px;padding:16px 26px;background:rgba(13,23,55,.7);min-width:170px;">
+        <div style="font-size:12px;letter-spacing:2px;color:#8d97b8;font-weight:600;margin-bottom:6px;">{{ s.k }}</div>
+        <div style="font-size:20px;font-weight:800;color:#eef1fa;">{{ s.v }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <button onClick="{{ onRestart }}" style="cursor:pointer;border:none;border-radius:999px;padding:16px 56px;font-size:18px;font-weight:800;letter-spacing:2px;color:#1a1206;background:linear-gradient(180deg,#f5cf6d,#d9a52f);box-shadow:0 10px 40px rgba(232,184,75,.35);" style-hover="transform:translateY(-2px);">NEUES SPIEL</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ showAudience }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(4,7,18,.75);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:50;">
+  <div style="width:560px;max-width:92vw;border:1px solid rgba(232,184,75,.45);border-radius:18px;background:linear-gradient(180deg,#111c42,#0a1130);padding:30px 34px;animation:mfPop .35s ease both;box-shadow:0 30px 90px rgba(0,0,0,.6);">
+    <div style="font-size:13px;letter-spacing:4px;color:#e8b84b;font-weight:800;margin-bottom:4px;">PUBLIKUMSJOKER</div>
+    <div style="font-size:15px;color:#8d97b8;margin-bottom:24px;">Das Studiopublikum hat abgestimmt:</div>
+    <div style="display:flex;align-items:flex-end;justify-content:center;gap:34px;height:220px;">
+      <sc-for list="{{ audienceBars }}" as="b" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:64px;">
+          <div style="font-size:15px;font-weight:800;color:#f0d9a0;font-variant-numeric:tabular-nums;">{{ b.pct }}</div>
+          <div style="width:44px;height:{{ b.h }};border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#f5cf6d,#b9852a);opacity:{{ b.op }};transition:height .6s ease;"></div>
+          <div style="font-size:16px;font-weight:900;color:#8d97b8;">{{ b.letter }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="text-align:center;margin-top:22px;"><button onClick="{{ closeModal }}" style="cursor:pointer;border:1px solid rgba(232,184,75,.4);border-radius:999px;padding:11px 34px;font-size:14px;font-weight:700;color:#f0d9a0;background:transparent;" style-hover="background:rgba(232,184,75,.1);">Danke, Publikum!</button></div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showPhone }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(4,7,18,.75);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:50;">
+  <div style="width:520px;max-width:92vw;border:1px solid rgba(232,184,75,.45);border-radius:18px;background:linear-gradient(180deg,#111c42,#0a1130);padding:30px 34px;animation:mfPop .35s ease both;box-shadow:0 30px 90px rgba(0,0,0,.6);">
+    <div style="font-size:13px;letter-spacing:4px;color:#e8b84b;font-weight:800;margin-bottom:4px;">TELEFONJOKER</div>
+    <div style="font-size:15px;color:#8d97b8;margin-bottom:20px;">Sie rufen an: <strong style="color:#eef1fa;">{{ phoneName }}</strong></div>
+    <div style="border-left:3px solid #e8b84b;padding:6px 0 6px 18px;font-size:19px;line-height:1.5;font-style:italic;color:#eef1fa;">„{{ phoneText }}“</div>
+    <div style="text-align:center;margin-top:24px;"><button onClick="{{ closeModal }}" style="cursor:pointer;border:1px solid rgba(232,184,75,.4);border-radius:999px;padding:11px 34px;font-size:14px;font-weight:700;color:#f0d9a0;background:transparent;" style-hover="background:rgba(232,184,75,.1);">Auflegen</button></div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showQuit }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(4,7,18,.75);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:50;">
+  <div style="width:480px;max-width:92vw;border:1px solid rgba(232,184,75,.45);border-radius:18px;background:linear-gradient(180deg,#111c42,#0a1130);padding:30px 34px;text-align:center;animation:mfPop .35s ease both;box-shadow:0 30px 90px rgba(0,0,0,.6);">
+    <div style="font-size:13px;letter-spacing:4px;color:#e8b84b;font-weight:800;margin-bottom:14px;">AUSSTEIGEN?</div>
+    <div style="font-size:19px;line-height:1.5;color:#eef1fa;">Sie verlassen das Studio mit<br><strong style="font-size:30px;color:#f5cf6d;font-variant-numeric:tabular-nums;">{{ walkLabel }}</strong></div>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:26px;">
+      <button onClick="{{ onQuitConfirm }}" style="cursor:pointer;border:none;border-radius:999px;padding:13px 32px;font-size:15px;font-weight:800;color:#1a1206;background:linear-gradient(180deg,#f5cf6d,#d9a52f);" style-hover="transform:translateY(-1px);">Ja, aussteigen</button>
+      <button onClick="{{ closeModal }}" style="cursor:pointer;border:1px solid rgba(141,151,184,.4);border-radius:999px;padding:13px 32px;font-size:15px;font-weight:600;color:#b9c2e0;background:transparent;" style-hover="border-color:#b9c2e0;">Weiterspielen</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;direktEinloggen&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Spielregeln&quot;}, &quot;spannungsPause&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 1400, &quot;min&quot;: 300, &quot;max&quot;: 3000, &quot;step&quot;: 100, &quot;unit&quot;: &quot;ms&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Spielgefühl&quot;}, &quot;soundAn&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Spielgefühl&quot;}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'start', tier: 0, q: null, sel: null, phase: 'pick', removed: [],
+    usedJ: { fifty: false, audience: false, phone: false, swap: false }, usedList: [],
+    modal: null, audData: null, phoneData: null, correct: 0, quip: '',
+    end: null, sound: null, usedQ: [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
+  };
+  LADDER = [50,100,200,300,500,1000,2000,4000,8000,16000,32000,64000,125000,500000,1000000];
+  LOCKQ = ['Sind Sie sicher?','Ist das Ihr letztes Wort?','Einloggen? Ganz sicher?','Da legen Sie sich fest?'];
+  OKQ = ['Richtig!','Ganz genau!','Sehr gut!','Das ist die richtige Antwort!'];
+  FRIENDS = ['Susanne, Lehrerin','Jürgen vom Quiz-Stammtisch','Aylin, Studentin','Opa Heinz','Dr. Weber, Bibliothekar'];
+
+  componentDidMount() {
+    import('./fragen.js').then(m => { this.F = m.FRAGEN; if (this._pend) this.start(); });
+    this._key = (e) => this.onKey(e);
+    document.addEventListener('keydown', this._key);
+  }
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this._key);
+    clearTimeout(this._t);
+  }
+  fmt(n) { return n.toLocaleString('de-DE') + ' €'; }
+  soundOn() { return this.state.sound ?? (this.props.soundAn ?? true); }
+
+  // --- audio (dezente Synth-Stinger) ---
+  ac() { if (!this._ac) { try { this._ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } return this._ac; }
+  tone(f, at, dur, type, g) {
+    const ac = this.ac(); if (!ac || !this.soundOn()) return;
+    const o = ac.createOscillator(), v = ac.createGain();
+    o.type = type || 'sine'; o.frequency.value = f;
+    const t0 = ac.currentTime + at;
+    v.gain.setValueAtTime(0, t0); v.gain.linearRampToValueAtTime(g || .06, t0 + .015);
+    v.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    o.connect(v).connect(ac.destination); o.start(t0); o.stop(t0 + dur + .05);
+  }
+  sPick() { this.tone(520, 0, .09, 'triangle', .05); }
+  sLock() { this.tone(300, 0, .25, 'sine', .07); this.tone(240, .12, .4, 'sine', .07); }
+  sOk() { [523, 659, 784].forEach((f, i) => this.tone(f, i * .09, .3, 'triangle', .07)); }
+  sNo() { this.tone(196, 0, .6, 'sawtooth', .05); this.tone(185, .02, .6, 'sawtooth', .05); }
+  sWin() { [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => this.tone(f, i * .11, .45, 'triangle', .07)); }
+  sJok() { this.tone(660, 0, .12, 'triangle', .05); this.tone(880, .1, .18, 'triangle', .05); }
+
+  start() {
+    if (!this.F) { this._pend = true; return; }
+    this._pend = false; this.ac();
+    this.setState({
+      screen: 'game', tier: 0, correct: 0, usedList: [], end: null, modal: null,
+      usedJ: { fifty: false, audience: false, phone: false, swap: false },
+      usedQ: this.state.usedQ
+    }, () => this.newQ(0));
+  }
+  newQ(tier) {
+    const pool = this.F[tier], usedQ = this.state.usedQ.map(a => a.slice());
+    let avail = pool.map((_, i) => i).filter(i => !usedQ[tier].includes(i));
+    if (!avail.length) { usedQ[tier] = []; avail = pool.map((_, i) => i); }
+    const i = avail[Math.floor(Math.random() * avail.length)];
+    usedQ[tier].push(i);
+    this.setState({ tier, q: pool[i], usedQ, sel: null, phase: 'pick', removed: [], audData: null, phoneData: null, quip: '' });
+  }
+  pick(i) {
+    const s = this.state;
+    if (s.phase !== 'pick' || s.removed.includes(i) || s.modal) return;
+    this.sPick();
+    if (this.props.direktEinloggen ?? false) this.setState({ sel: i }, () => this.lock());
+    else this.setState({ sel: i, phase: 'confirm', quip: this.LOCKQ[Math.floor(Math.random() * this.LOCKQ.length)] });
+  }
+  unpick() { if (this.state.phase === 'confirm') this.setState({ sel: null, phase: 'pick', quip: '' }); }
+  lock() {
+    if (this.state.sel == null) return;
+    this.setState({ phase: 'suspense', quip: '' }); this.sLock();
+    const wait = (this.props.spannungsPause ?? 1400) + this.state.tier * 60;
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.reveal(), wait);
+  }
+  reveal() {
+    const s = this.state, ok = s.sel === s.q.c;
+    if (ok) {
+      const won = s.tier === 14;
+      if (won) this.sWin(); else this.sOk();
+      this.setState({ phase: 'reveal', correct: s.correct + 1, quip: won ? '' : this.OKQ[Math.floor(Math.random() * this.OKQ.length)] });
+    } else { this.sNo(); this.setState({ phase: 'reveal', quip: 'Das war leider nicht die richtige Antwort.' }); }
+  }
+  next() {
+    const s = this.state;
+    if (s.tier === 14) return this.endGame('won');
+    this.newQ(s.tier + 1);
+  }
+  safetyAmount() { const t = this.state.tier; return t >= 10 ? 16000 : t >= 5 ? 500 : 0; }
+  walkAmount() { const t = this.state.tier; return t > 0 ? this.LADDER[t - 1] : 0; }
+  endGame(reason) {
+    const amount = reason === 'won' ? 1000000 : reason === 'quit' ? this.walkAmount() : this.safetyAmount();
+    clearTimeout(this._t);
+    this.setState({ screen: 'end', modal: null, end: { reason, amount } });
+  }
+  // --- Joker ---
+  useJoker(k, label, fn) {
+    const s = this.state;
+    if (s.usedJ[k] || s.phase !== 'pick' || s.modal) return;
+    this.sJok();
+    this.setState({ usedJ: { ...s.usedJ, [k]: true }, usedList: [...s.usedList, label] }, fn);
+  }
+  fifty() {
+    this.useJoker('fifty', '50:50', () => {
+      const s = this.state, wrong = [0, 1, 2, 3].filter(i => i !== s.q.c);
+      wrong.sort(() => Math.random() - .5);
+      this.setState({ removed: wrong.slice(0, 2) });
+    });
+  }
+  audience() {
+    this.useJoker('audience', 'Publikum', () => {
+      const s = this.state, t = s.tier, cand = [0, 1, 2, 3].filter(i => !s.removed.includes(i));
+      const base = t < 5 ? 62 : t < 10 ? 48 : 34;
+      let cPct = Math.min(92, Math.round(base + Math.random() * 22 + (cand.length === 2 ? 12 : 0)));
+      const pcts = [0, 0, 0, 0]; pcts[s.q.c] = cPct;
+      let rest = 100 - cPct;
+      const others = cand.filter(i => i !== s.q.c);
+      others.forEach((i, idx) => {
+        const v = idx === others.length - 1 ? rest : Math.round(Math.random() * rest);
+        pcts[i] = v; rest -= v;
+      });
+      this.setState({ audData: pcts, modal: 'audience' });
+    });
+  }
+  phone() {
+    this.useJoker('phone', 'Telefon', () => {
+      const s = this.state, t = s.tier, cand = [0, 1, 2, 3].filter(i => !s.removed.includes(i));
+      const p = t < 5 ? .95 : t < 10 ? .8 : .62;
+      const others = cand.filter(i => i !== s.q.c);
+      const guess = Math.random() < p || !others.length ? s.q.c : others[Math.floor(Math.random() * others.length)];
+      const L = 'ABCD'[guess], sure = t < 5
+        ? `Das weiß ich hundertprozentig: ${L}, ${s.q.a[guess]}.`
+        : t < 10 ? `Ich bin mir ziemlich sicher, dass es ${L} ist – ${s.q.a[guess]}.`
+        : `Puh, schwer … ich bin nicht sicher, aber ich würde ${L} sagen: ${s.q.a[guess]}.`;
+      this.setState({ phoneData: { name: this.FRIENDS[Math.floor(Math.random() * this.FRIENDS.length)], text: sure }, modal: 'phone' });
+    });
+  }
+  swap() { this.useJoker('swap', 'Tausch', () => this.newQ(this.state.tier)); }
+
+  onKey(e) {
+    const s = this.state;
+    if (e.key === 'Escape') { if (s.modal) return this.setState({ modal: null }); if (s.phase === 'confirm') return this.unpick(); }
+    if (s.modal) { if (e.key === 'Enter') this.setState({ modal: null }); return; }
+    if (s.screen === 'start' && e.key === 'Enter') return this.start();
+    if (s.screen === 'end' && e.key === 'Enter') return this.start();
+    if (s.screen !== 'game') return;
+    const idx = ['a', 'b', 'c', 'd'].indexOf(e.key.toLowerCase());
+    if (idx > -1 && s.phase === 'pick') return this.pick(idx);
+    if (idx > -1 && s.phase === 'confirm') return this.setState({ sel: null, phase: 'pick' }, () => this.pick(idx));
+    if (e.key === 'Enter') {
+      if (s.phase === 'confirm') return this.lock();
+      if (s.phase === 'reveal') { const ok = s.sel === s.q.c; return ok ? this.next() : this.endGame('wrong'); }
+    }
+  }
+
+  renderVals() {
+    const s = this.state, q = s.q || { q: '', a: ['', '', '', ''], c: 0 };
+    const reveal = s.phase === 'reveal', ok = s.sel === q.c;
+    const answers = q.a.map((text, i) => {
+      const rem = s.removed.includes(i), isSel = s.sel === i;
+      let bg = 'linear-gradient(180deg,#111c42,#0b1230)', border = 'rgba(232,184,75,.35)', lc = '#e8b84b', tc = '#eef1fa', anim = 'none', op = '1';
+      if (rem) op = '.12';
+      else if (reveal) {
+        if (i === q.c) { bg = 'linear-gradient(180deg,#1d8a46,#0f5228)'; border = '#4be389'; lc = '#d8ffe6'; }
+        else if (isSel) { bg = 'linear-gradient(180deg,#9c2233,#5a0f1a)'; border = '#ff8093'; lc = '#ffd7dd'; }
+        else op = '.4';
+      } else if (isSel) {
+        bg = 'linear-gradient(180deg,#c9992d,#8a6712)'; border = '#f5cf6d'; lc = '#231803'; tc = '#fffbe9';
+        if (s.phase === 'suspense') anim = 'mfPulse 1s ease-in-out infinite';
+      }
+      return { letter: 'ABCD'[i] + ':', text, bg, border, lc, tc, anim, op,
+        cursor: s.phase === 'pick' && !rem ? 'pointer' : 'default', pick: () => this.pick(i) };
+    });
+    const jokers = [
+      { k: 'fifty', label: '50:50', title: 'Zwei falsche Antworten werden entfernt', fn: () => this.fifty() },
+      { k: 'audience', label: 'Publikum', title: 'Das Publikum stimmt ab', fn: () => this.audience() },
+      { k: 'phone', label: 'Anruf', title: 'Einen Bekannten anrufen', fn: () => this.phone() },
+      { k: 'swap', label: 'Tausch', title: 'Frage gegen eine neue tauschen', fn: () => this.swap() }
+    ].map(j => ({ label: j.label, title: j.title, onClick: j.fn,
+      op: s.usedJ[j.k] ? '.28' : '1', deco: s.usedJ[j.k] ? 'line-through' : 'none',
+      pe: s.usedJ[j.k] || s.phase !== 'pick' ? 'none' : 'auto' }));
+    const ladderRows = [];
+    for (let i = 14; i >= 0; i--) {
+      const cur = i === s.tier && s.screen === 'game', past = i < s.tier, safe = i === 4 || i === 9 || i === 14;
+      ladderRows.push({
+        num: i + 1, amount: this.fmt(this.LADDER[i]),
+        bg: cur ? 'linear-gradient(90deg,rgba(232,184,75,.95),rgba(217,165,47,.8))' : 'transparent',
+        color: cur ? '#160f02' : past ? '#e8b84b' : safe ? '#eef1fa' : '#8d97b8',
+        fw: cur ? '800' : safe ? '700' : '500',
+        numColor: cur ? 'rgba(22,15,2,.6)' : '#4d5678',
+        mark: safe ? '●' : '', markColor: cur ? 'rgba(22,15,2,.6)' : '#e8b84b'
+      });
+    }
+    const aud = s.audData || [0, 0, 0, 0];
+    const audienceBars = aud.map((p, i) => ({
+      letter: 'ABCD'[i], pct: s.removed.includes(i) ? '–' : p + ' %',
+      h: Math.max(5, Math.round(p * 1.55)) + 'px', op: s.removed.includes(i) ? '.15' : '1'
+    }));
+    const end = s.end || { reason: 'quit', amount: 0 };
+    const endMap = {
+      won: ['SIE SIND MILLIONÄR!', '#4be389', 'Alle 15 Fragen richtig – das Studio steht Kopf. Herzlichen Glückwunsch!'],
+      quit: ['AUSGESTIEGEN', '#e8b84b', 'Eine gute Entscheidung? Das wissen nur Sie. Danke fürs Spielen!'],
+      wrong: ['LEIDER FALSCH', '#ff8093', 'Sie fallen auf die letzte Sicherheitsstufe zurück. Beim nächsten Mal klappt es!']
+    };
+    const em = endMap[end.reason];
+    return {
+      isStart: s.screen === 'start', isGame: s.screen === 'game', isEnd: s.screen === 'end',
+      onStart: () => this.start(), onRestart: () => this.start(),
+      questionText: q.q, tierNum: s.tier + 1, amountLabel: this.fmt(this.LADDER[s.tier]),
+      securedLabel: this.fmt(this.safetyAmount()), walkLabel: this.fmt(this.walkAmount()),
+      quip: s.quip, answers, jokers,
+      showConfirm: s.phase === 'confirm', onLock: () => this.lock(), onUnpick: () => this.unpick(),
+      showSuspense: s.phase === 'suspense',
+      showNext: reveal && ok, onNext: () => this.next(),
+      nextLabel: s.tier === 14 ? 'MILLION ABHOLEN!' : 'WEITER',
+      revealMsg: reveal ? (ok ? s.quip : 'Leider falsch.') : '',
+      showLose: reveal && !ok, onToEnd: () => this.endGame('wrong'),
+      quitOp: s.phase === 'pick' ? '1' : '.3', quitPe: s.phase === 'pick' ? 'auto' : 'none',
+      onQuitAsk: () => { if (this.state.phase === 'pick') this.setState({ modal: 'quit' }); },
+      onQuitConfirm: () => this.endGame('quit'),
+      showAudience: s.modal === 'audience', showPhone: s.modal === 'phone', showQuit: s.modal === 'quit',
+      closeModal: () => this.setState({ modal: null }),
+      audienceBars, phoneName: (s.phoneData || {}).name || '', phoneText: (s.phoneData || {}).text || '',
+      soundLabel: this.soundOn() ? 'Ton: an' : 'Ton: aus',
+      toggleSound: () => this.setState({ sound: !this.soundOn() }),
+      ladderRows,
+      endTitle: em[0], endTitleColor: em[1], endLine: em[2], endAmount: this.fmt(end.amount),
+      statChips: [
+        { k: 'RICHTIGE ANTWORTEN', v: s.correct + ' von 15' },
+        { k: 'ERREICHTE FRAGE', v: 'Frage ' + Math.min(15, s.tier + 1) },
+        { k: 'JOKER BENUTZT', v: s.usedList.length ? s.usedList.join(', ') : 'keine' }
+      ]
+    };
+  }
+}
+</script>
+<nav id="game-nav" aria-label="Game navigation" style="position:fixed;right:10px;bottom:8px;z-index:2147483647;display:flex;gap:12px;align-items:center;font:600 13px/1.4 system-ui,-apple-system,sans-serif;padding:6px 11px;border-radius:8px;background:rgba(15,17,26,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:.55;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.55">
+  <span id="version-badge" title="Version" style="color:#5a6072"></span>
+  <span style="color:#5a6072" aria-hidden="true">·</span>
+  <a href="https://github.freaxnx01.ch/games/" style="color:#8fd8e8;text-decoration:none">More Games…</a>
+  <span style="color:#5a6072" aria-hidden="true">·</span>
+  <a href="https://github.com/freaxnx01/game-millionenfrage" target="_blank" rel="noopener" style="color:#8fd8e8;text-decoration:none">Source</a>
+  <span style="color:#5a6072" aria-hidden="true">·</span>
+  <a href="https://github.com/freaxnx01/game-millionenfrage/issues/new?title=%5BFeedback%5D%20game-millionenfrage&labels=feedback" target="_blank" rel="noopener" style="color:#8fd8e8;text-decoration:none">Feedback</a>
+  <span style="color:#5a6072" aria-hidden="true">·</span>
+  <a class="github-button" href="https://github.com/freaxnx01/game-millionenfrage" data-icon="octicon-star" data-size="small" data-show-count="true" aria-label="Star freaxnx01/game-millionenfrage on GitHub">Star</a>
+</nav>
+<script async defer crossorigin="anonymous" src="https://buttons.github.io/buttons.js"></script>
+<script>
+  (function () {
+    var el = document.getElementById('version-badge');
+    if (!el) return;
+    var a = document.createElement('a');
+    a.href = 'https://github.com/freaxnx01/game-millionenfrage/blob/main/CHANGELOG.md';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.title = 'Changelog';
+    a.textContent = 'v' + (window.GAME_VERSION || '0.0.0');
+    a.style.color = 'inherit';
+    a.style.textDecoration = 'none';
+    el.appendChild(a);
+  })();
+</script>
+</body>
+</html>
